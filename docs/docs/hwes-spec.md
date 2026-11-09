@@ -1,4 +1,4 @@
-# DOKUMEN 4: SPESIFIKASI ALGORITMA HWES & RESTOCK (hwes-spec.md)
+# DOKUMEN: SPESIFIKASI ALGORITMA HWES & RESTOCK (hwes-spec.md)
 **Proyek:** Smart Stock UMKM (Florawins)
 
 ---

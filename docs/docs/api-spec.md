@@ -10,8 +10,8 @@
 - **Request Body:**
   ```json
   {
-    "email": "admin@florawins.com",
-    "password": "Admin123!"
+    "email": "********",
+    "password": "******!"
   }
   ```
 - **Response 200 (Sukses):**

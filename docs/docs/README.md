@@ -1,4 +1,4 @@
-# DOKUMEN 9: REPOSITORY README (README.md)
+# DOKUMEN: REPOSITORY README (README.md)
 # Smart Stock UMKM (Florawins)
 
 Aplikasi manajemen stok dan peramalan restock harian untuk UMKM/Florist menggunakan algoritma **Holt-Winters Exponential Smoothing (HWES, m=7)** dan **Simple Moving Average (SMA)** sebagai fallback.

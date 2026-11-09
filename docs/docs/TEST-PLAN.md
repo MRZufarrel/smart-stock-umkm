@@ -1,4 +1,4 @@
-# DOKUMEN 5: RENCANA PENGUJIAN & UAT (TEST-PLAN.md)
+# DOKUMEN: RENCANA PENGUJIAN & UAT (TEST-PLAN.md)
 **Proyek:** Smart Stock UMKM (Florawins)
 
 ---
@@ -12,9 +12,12 @@
 3. **Pembulatan Nilai Negatif:** Prediksi minus dipaksa menjadi 0.
 
 ### B. Kalkulasi Restock (`restockService.test.js`)
-1. **Perhitungan ROP:** $D_{avg}=10, LT=3, SS=5 ightarrow ROP = 35$.
-2. **Perhitungan Q:** $F_{total}=70, SS=5, C_{stock}=20 ightarrow Q = 55$.
-3. **Stok Aman:** $F_{total}=10, SS=5, C_{stock}=30 ightarrow Q = 0$, `needs_restock = false`.
+1. **Perhitungan ROP:** $D_{avg}=10, LT=3, SS=5 
+ightarrow ROP = 35$.
+2. **Perhitungan Q:** $F_{total}=70, SS=5, C_{stock}=20 
+ightarrow Q = 55$.
+3. **Stok Aman:** $F_{total}=10, SS=5, C_{stock}=30 
+ightarrow Q = 0$, `needs_restock = false`.
 
 ---
 

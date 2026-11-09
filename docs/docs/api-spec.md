@@ -1,4 +1,4 @@
-# DOKUMEN 3: SPESIFIKASI REST API (api-spec.md)
+# DOKUMEN: SPESIFIKASI REST API (api-spec.md)
 **Proyek:** Smart Stock UMKM (Florawins)  
 **Base URL:** `/api`  
 

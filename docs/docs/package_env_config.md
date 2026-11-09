@@ -1,4 +1,4 @@
-# DOKUMEN 6: KONFIGURASI PROJECT & DEPENDENSI (package.json & .env)
+# DOKUMEN: KONFIGURASI PROJECT & DEPENDENSI (package.json & .env)
 **Proyek:** Smart Stock UMKM (Florawins)
 
 ---

@@ -10,8 +10,8 @@
 - **Request Body:**
   ```json
   {
-    "email": "********",
-    "password": "******!"
+    "email": "admin@example.com",
+    "password": "password_kamu_di_sini"
   }
   ```
 - **Response 200 (Sukses):**

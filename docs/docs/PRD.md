@@ -1,4 +1,4 @@
-# DOKUMEN 1: PRODUCT REQUIREMENTS DOCUMENT (PRD.md)
+# DOKUMEN: PRODUCT REQUIREMENTS DOCUMENT (PRD.md)
 **Proyek:** Smart Stock UMKM (Florawins)  
 **Versi:** 1.0  
 **Peran Pengguna:** Single Admin (`admin@florawins.com`)  

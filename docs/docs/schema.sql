@@ -1,4 +1,4 @@
--- DOKUMEN 2: SKEMA DATABASE POSTGRESQL (schema.sql)
+-- DOKUMEN: SKEMA DATABASE POSTGRESQL (schema.sql)
 -- Proyek: Smart Stock UMKM (Florawins)
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";

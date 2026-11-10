@@ -239,6 +239,52 @@ export const calculateSMA = (series, forecastDays = 7, period = null) => {
 export const calculateHWES = calculateHoltWinters;
 
 /**
+ * Menghitung Mean Absolute Percentage Error (MAPE) antara data aktual dan prediksi.
+ * Mengembalikan persentase kesalahan rata-rata dalam rentang 0-100 (mis. 12.34).
+ */
+export const calculateMAPE = (actuals, predictions) => {
+  const actualValues = normalizeSeries(actuals);
+  const predictedValues = normalizeSeries(predictions);
+
+  if (actualValues.length !== predictedValues.length) {
+    throw new RangeError(
+      'Jumlah data aktual dan data prediksi harus sama untuk menghitung MAPE.'
+    );
+  }
+
+  if (actualValues.length === 0) {
+    return 0;
+  }
+
+  let totalPercentageError = 0;
+  let validPointsCount = 0;
+
+  for (let index = 0; index < actualValues.length; index += 1) {
+    const actual = actualValues[index];
+    const predicted = predictedValues[index];
+
+    // Penjualan aktual 0 dilewati untuk mencegah pembagian dengan nol.
+    if (actual === 0) {
+      if (predicted === 0) {
+        validPointsCount += 1;
+      }
+      continue;
+    }
+
+    totalPercentageError += Math.abs((actual - predicted) / actual);
+    validPointsCount += 1;
+  }
+
+  if (validPointsCount === 0) {
+    return 0;
+  }
+
+  const mape = (totalPercentageError / validPointsCount) * 100;
+
+  return Math.round(mape * 100) / 100;
+};
+
+/**
  * Memilih HWES_M7 atau SMA_FALLBACK dan mengembalikan metadata hasil.
  */
 export const calculateForecast = (series, options = {}) => {
@@ -354,6 +400,7 @@ export default {
   calculateHoltWinters,
   calculateHWES,
   calculateSMA,
+  calculateMAPE,
   calculateForecast,
   getHistoricalDailySales,
   getVariantForecast,

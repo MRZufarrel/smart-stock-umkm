@@ -99,4 +99,62 @@ describe('Integrasi Penjualan & Integritas Stok (sales)', () => {
     expect(response.body.status).toBe('success');
     expect(Array.isArray(response.body.data)).toBe(true);
   });
+
+  describe('Import CSV Penjualan (POST /api/sales/import-csv)', () => {
+    it('menolak jika file tidak disertakan (HTTP 400 FILE_REQUIRED)', async () => {
+      const response = await request(app)
+        .post('/api/sales/import-csv')
+        .set('Authorization', `Bearer ${authToken}`);
+
+      expect(response.status).toBe(400);
+      expect(response.body.code).toBe('FILE_REQUIRED');
+    });
+
+    it('menolak jika file yang diunggah bukan berekstensi .csv (HTTP 400 INVALID_FILE_TYPE)', async () => {
+      const response = await request(app)
+        .post('/api/sales/import-csv')
+        .set('Authorization', `Bearer ${authToken}`)
+        .attach('file', Buffer.from('konten dummy'), 'laporan.txt');
+
+      expect(response.status).toBe(400);
+      expect(response.body.code).toBe('INVALID_FILE_TYPE');
+    });
+
+    it('menolak jika CSV kosong tanpa baris data (HTTP 422 EMPTY_CSV)', async () => {
+      const emptyCsv = 'sale_date,sku,quantity\n';
+      const response = await request(app)
+        .post('/api/sales/import-csv')
+        .set('Authorization', `Bearer ${authToken}`)
+        .attach('file', Buffer.from(emptyCsv), 'kosong.csv');
+
+      expect(response.status).toBe(422);
+      expect(response.body.code).toBe('EMPTY_CSV');
+    });
+
+    it('menolak transaksi jika kolom atau baris CSV rusak/tidak valid (HTTP 422)', async () => {
+      const malformedCsv = `sale_date,sku,quantity
+2026-11-10,${targetVariant ? targetVariant.sku : 'TEST-SKU'},bukan_angka`;
+
+      const response = await request(app)
+        .post('/api/sales/import-csv')
+        .set('Authorization', `Bearer ${authToken}`)
+        .attach('file', Buffer.from(malformedCsv), 'rusak.csv');
+
+      expect(response.status).toBe(422);
+      expect(response.body.status).toBe('error');
+    });
+
+    it('menolak seluruh batch secara atomis jika ada SKU yang tidak terdaftar (HTTP 422 SKU_NOT_FOUND)', async () => {
+      const invalidSkuCsv = `sale_date,sku,quantity
+2026-11-10,SKU_TIDAK_ADA_DI_DATABASE_9999,1`;
+
+      const response = await request(app)
+        .post('/api/sales/import-csv')
+        .set('Authorization', `Bearer ${authToken}`)
+        .attach('file', Buffer.from(invalidSkuCsv), 'invalid_sku.csv');
+
+      expect(response.status).toBe(422);
+      expect(response.body.code).toBe('SKU_NOT_FOUND');
+    });
+  });
 });

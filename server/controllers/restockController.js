@@ -2,24 +2,52 @@ import pool from '../config/db.js';
 
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
 const isValidUuid = (value) =>
   typeof value === 'string' && UUID_PATTERN.test(value);
 
-const isValidDate = (value) => {
-  if (typeof value !== 'string' || !DATE_PATTERN.test(value)) {
-    return false;
+/**
+ * 
+ * Mendukung: "YYYY-MM-DD", "YYYY/MM/DD", "DD/MM/YYYY", "DD-MM-YYYY"
+ */
+const parseFlexibleDate = (value) => {
+  if (typeof value !== 'string') return null;
+  const str = value.trim();
+  if (!str) return null;
+
+  let year, month, day;
+
+  // 1. Format ISO (YYYY-MM-DD atau YYYY/MM/DD)
+  const isoMatch = str.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/);
+  if (isoMatch) {
+    year = Number(isoMatch[1]);
+    month = Number(isoMatch[2]);
+    day = Number(isoMatch[3]);
+  } else {
+    // 2. Format Indonesia / Excel (DD/MM/YYYY atau DD-MM-YYYY)
+    const indoMatch = str.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+    if (indoMatch) {
+      day = Number(indoMatch[1]);
+      month = Number(indoMatch[2]);
+      year = Number(indoMatch[3]);
+    } else {
+      return null;
+    }
   }
 
-  const [year, month, day] = value.split('-').map(Number);
   const date = new Date(Date.UTC(year, month - 1, day));
-
-  return (
+  if (
     date.getUTCFullYear() === year &&
     date.getUTCMonth() === month - 1 &&
     date.getUTCDate() === day
-  );
+  ) {
+    const yyyy = String(year).padStart(4, '0');
+    const mm = String(month).padStart(2, '0');
+    const dd = String(day).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
+  return null;
 };
 
 const parsePositiveInteger = (value) => {
@@ -66,21 +94,26 @@ export const createRestock = async (req, res) => {
       });
     }
 
-    const restockDate =
-      typeof body.restock_date === 'string' && body.restock_date.trim()
-        ? body.restock_date.trim()
-        : null;
+    const hasRestockDateInput =
+      typeof body.restock_date === 'string' && body.restock_date.trim() !== '';
 
-    if (restockDate !== null && !isValidDate(restockDate)) {
-      return res.status(400).json({
-        status: 'error',
-        code: 'VALIDATION_ERROR',
-        message: 'restock_date harus berformat YYYY-MM-DD dan tanggal harus valid.',
-      });
+    let restockDate = null;
+    if (hasRestockDateInput) {
+      restockDate = parseFlexibleDate(body.restock_date);
+      if (!restockDate) {
+        return res.status(400).json({
+          status: 'error',
+          code: 'VALIDATION_ERROR',
+          message:
+            'restock_date tidak valid. Gunakan format YYYY-MM-DD atau DD/MM/YYYY.',
+        });
+      }
     }
 
     const supplierNote =
-      typeof body.supplier_note === 'string' ? body.supplier_note.trim() || null : null;
+      typeof body.supplier_note === 'string'
+        ? body.supplier_note.trim() || null
+        : null;
 
     const client = await pool.connect();
     let transactionOpen = false;

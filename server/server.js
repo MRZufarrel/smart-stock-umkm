@@ -15,7 +15,11 @@ dotenv.config({ path: path.resolve(__dirname, '.env') });
 
 const app = express();
 
-app.use(cors());
+// Izinkan request hanya dari origin frontend yang sudah dikonfigurasi.
+// Default ke localhost:5173 (Vite dev server) jika variabel belum diatur.
+const allowedOrigin = process.env.CORS_ORIGIN || 'http://localhost:5173';
+app.use(cors({ origin: allowedOrigin }));
+
 app.use(express.json());
 
 app.use('/api/auth', authRoutes);

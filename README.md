@@ -1,4 +1,4 @@
-# Smart Stock UMKM (Toko Florawins)
+# Smart Stock UMKM (Toko Online Florawins)
 
 Aplikasi manajemen inventaris dan sistem rekomendasi restock harian untuk UMKM Toko Florawins menggunakan peramalan deret berkala **Holt-Winters Exponential Smoothing (HWES Additive, $m=7$)** dengan fallback **Simple Moving Average (SMA)**, kalkulasi **Reorder Point (ROP)**, dan **Order Quantity ($Q$)**.
 

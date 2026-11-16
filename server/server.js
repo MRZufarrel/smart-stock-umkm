@@ -15,35 +15,14 @@ dotenv.config({ path: path.resolve(__dirname, '.env') });
 
 const app = express();
 
-// Izinkan request dari origin frontend (mendukung multiple origin dipisahkan koma).
-// Default ke localhost:5173 (Vite dev server) jika variabel belum diatur.
-const rawCors = process.env.CORS_ORIGIN || 'http://localhost:5173';
-const allowedOrigins = rawCors.split(',').map((origin) => origin.trim());
+// Konfigurasi CORS: jika CORS_ORIGIN diatur maka gunakan whitelist tersebut,
+// jika tidak (seperti di Vercel cloud) otomatis izinkan origin pemanggil (origin: true).
+const rawCors = process.env.CORS_ORIGIN;
+const allowedOrigins = rawCors ? rawCors.split(',').map((s) => s.trim()) : null;
 
 app.use(
   cors({
-    origin: (origin, callback) => {
-      // Izinkan request tanpa header origin (mis. supertest, server-to-server, curl)
-      if (!origin || allowedOrigins.includes('*') || allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-
-      // Otomatis izinkan semua deployment Vercel (*.vercel.app) dan localhost
-      try {
-        const { hostname } = new URL(origin);
-        if (
-          hostname === 'localhost' ||
-          hostname === '127.0.0.1' ||
-          hostname.endsWith('.vercel.app')
-        ) {
-          return callback(null, true);
-        }
-      } catch (err) {
-        // Abaikan parse error
-      }
-
-      return callback(new Error('Akses ditolak oleh kebijakan CORS.'));
-    },
+    origin: allowedOrigins && !allowedOrigins.includes('*') ? allowedOrigins : true,
     credentials: true,
   })
 );

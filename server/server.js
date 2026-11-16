@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url';
 import dotenv from 'dotenv';
 import express from 'express';
 import cors from 'cors';
+import pool from './config/db.js';
 import authRoutes from './routes/auth.js';
 import categoryRoutes from './routes/categories.js';
 import productRoutes from './routes/products.js';
@@ -36,6 +37,25 @@ app.get('/api/health', (req, res) => {
     message: 'Smart Stock API aktif.',
     timestamp: new Date().toISOString(),
   });
+});
+
+// Diagnostic DB check
+app.get('/api/db-check', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT count(*) FROM users');
+    return res.status(200).json({
+      status: 'success',
+      database: 'connected',
+      userCount: result.rows[0].count,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: 'error',
+      database: 'disconnected',
+      error: error.message,
+      code: error.code,
+    });
+  }
 });
 
 app.use('/api/auth', authRoutes);

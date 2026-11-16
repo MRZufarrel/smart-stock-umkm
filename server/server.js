@@ -77,7 +77,7 @@ app.use((error, req, res, next) => {
   });
 });
 
-if (process.env.NODE_ENV !== 'test') {
+if (process.env.NODE_ENV !== 'test' && !process.env.VERCEL) {
   if (!process.env.JWT_SECRET || !process.env.JWT_SECRET.trim()) {
     throw new Error(
       'JWT_SECRET belum diatur. Salin server/.env.example menjadi server/.env lalu isi nilainya.'

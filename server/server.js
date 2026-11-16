@@ -15,12 +15,34 @@ dotenv.config({ path: path.resolve(__dirname, '.env') });
 
 const app = express();
 
-// Izinkan request hanya dari origin frontend yang sudah dikonfigurasi.
+// Izinkan request dari origin frontend (mendukung multiple origin dipisahkan koma).
 // Default ke localhost:5173 (Vite dev server) jika variabel belum diatur.
-const allowedOrigin = process.env.CORS_ORIGIN || 'http://localhost:5173';
-app.use(cors({ origin: allowedOrigin }));
+const rawCors = process.env.CORS_ORIGIN || 'http://localhost:5173';
+const allowedOrigins = rawCors.split(',').map((origin) => origin.trim());
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Izinkan request tanpa header origin (mis. supertest, server-to-server, curl)
+      if (!origin || allowedOrigins.includes('*') || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error('Akses ditolak oleh kebijakan CORS.'));
+    },
+    credentials: true,
+  })
+);
 
 app.use(express.json());
+
+// Health check endpoint untuk cloud monitoring & deployment ping
+app.get('/api/health', (req, res) => {
+  return res.status(200).json({
+    status: 'success',
+    message: 'Smart Stock API aktif.',
+    timestamp: new Date().toISOString(),
+  });
+});
 
 app.use('/api/auth', authRoutes);
 app.use('/api/categories', categoryRoutes);
@@ -62,7 +84,8 @@ if (process.env.NODE_ENV !== 'test') {
     );
   }
 
-  const PORT = Number(process.env.PORT);
+  const rawPort = process.env.PORT;
+  const PORT = rawPort ? Number(rawPort) : 5000;
 
   if (!Number.isInteger(PORT) || PORT < 1 || PORT > 65535) {
     throw new Error('PORT belum diatur dengan benar. Periksa file server/.env.');

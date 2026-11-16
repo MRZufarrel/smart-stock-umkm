@@ -27,6 +27,21 @@ app.use(
       if (!origin || allowedOrigins.includes('*') || allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
+
+      // Otomatis izinkan semua deployment Vercel (*.vercel.app) dan localhost
+      try {
+        const { hostname } = new URL(origin);
+        if (
+          hostname === 'localhost' ||
+          hostname === '127.0.0.1' ||
+          hostname.endsWith('.vercel.app')
+        ) {
+          return callback(null, true);
+        }
+      } catch (err) {
+        // Abaikan parse error
+      }
+
       return callback(new Error('Akses ditolak oleh kebijakan CORS.'));
     },
     credentials: true,
